@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Image Gallery</title>
+    <title>Galeria Interactiva</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         body {
@@ -25,30 +25,118 @@
         .thumbnail:hover {
             transform: scale(1.1);
         }
+        .image-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            text-align: center;
+        }
         .large-image {
-            margin-top: 20px;
             width: 400px;
             height: auto;
+            transition: transform 0.3s;
+        }
+        .large-image:hover {
+            transform: scale(1.2);
+        }
+        #closeButton {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 50%;
+        }
+        #prev, #next {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: black;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            font-size: 18px;
+            border-radius: 50%;
             display: none;
         }
+        #prev { left: -50px; }
+        #next { right: -50px; }
     </style>
 </head>
 <body>
-    <h1>Interactive Image Gallery</h1>
+    <h1>Galeria Interactiva</h1>
     <div class="gallery">
-        <img class="thumbnail" src="img.jpg" data-full="img.jpg" alt="Image 1">
-        <img class="thumbnail" src="messiteamo.jpeg" data-full="messiteamo.jpeg" alt="Image 2">
-        <img class="thumbnail" src="post3.jpg" data-full="post3.jpg" alt="Image 3">
+        <img class="thumbnail" src="imagenes/img.jpg" data-full="imagenes/img.jpg" alt="Image 1">
+        <img class="thumbnail" src="imagenes/messiteamo.jpeg" data-full="imagenes/messiteamo.jpeg" alt="Image 2">
+        <img class="thumbnail" src="imagenes/story7.jpg" data-full="imagenes/story7.jpg" alt="Image 3">
+        <img class="thumbnail" src="imagenes/img4.jpeg" data-full="imagenes/img4.jpeg" alt="Image 4">
+        <img class="thumbnail" src="imagenes/pro4.jpg" data-full="imagenes/pro4.jpg" alt="Image 5">
+        <img class="thumbnail" src="imagenes/post2.jpg" data-full="imagenes/post2.jpg" alt="Image 6">
+        <img class="thumbnail" src="imagenes/macc.jpg" data-full="imagenes/macc.jpg" alt="Image 7">
     </div>
-    <img id="largeImage" class="large-image" src="" alt="Large Image">
-    
+
+    <!-- Contenedor de la imagen grande con controles -->
+    <div class="image-container">
+        <button id="closeButton">X</button>
+        <button id="prev">⬅</button>
+        <img id="largeImage" class="large-image" src="" alt="Large Image">
+        <button id="next">➡</button>
+    </div>
+
     <script>
         $(document).ready(function() {
-            $(".thumbnail").on("click", function() {
-                let newSrc = $(this).data("full");
+            let thumbnails = $(".thumbnail");
+            let currentIndex = 0;
+
+            // Función para actualizar la imagen grande
+            function updateImage(index) {
+                let newSrc = thumbnails.eq(index).data("full");
                 $("#largeImage").fadeOut(300, function() {
                     $(this).attr("src", newSrc).fadeIn(300);
                 });
+            }
+
+            // Evento al hacer clic en una miniatura
+            $(".thumbnail").on("click", function() {
+                currentIndex = thumbnails.index(this);
+                updateImage(currentIndex);
+                $(".image-container").fadeIn(300);
+                $("#prev, #next").show();
+            });
+
+            // Botón de cerrar
+            $("#closeButton").on("click", function() {
+                $(".image-container").fadeOut(300);
+                $("#prev, #next").hide();
+            });
+
+            // Navegación con flechas
+            $("#prev").on("click", function() {
+                currentIndex = (currentIndex - 1 + thumbnails.length) % thumbnails.length;
+                updateImage(currentIndex);
+            });
+
+            $("#next").on("click", function() {
+                currentIndex = (currentIndex + 1) % thumbnails.length;
+                updateImage(currentIndex);
+            });
+
+            // Navegación con teclado
+            $(document).on("keydown", function(e) {
+                if (e.key === "ArrowLeft") {
+                    $("#prev").click();
+                } else if (e.key === "ArrowRight") {
+                    $("#next").click();
+                } else if (e.key === "Escape") {
+                    $("#closeButton").click();
+                }
             });
         });
     </script>
